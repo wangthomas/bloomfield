@@ -2,34 +2,73 @@ package plainFilter
 
 import (
 	"testing"
-	"fmt"
+	"hash/fnv"
+	"github.com/OneOfOne/xxhash"
+	. "gopkg.in/check.v1"
 )
 
-// type BloomSuite struct {
-// 	filter PlainFilter
-// }
 
-// func Test(t *testing.T) {
-// 	TestingT(t)
-// }
+func Test(t *testing.T) { TestingT(t) }
 
-func TestNewPlainFilter(t *testing.T) {
-	cap := uint64(100)
-	filter := NewPlainFilter(cap, 0.001)
-	fmt.Println("num_hash is ", filter.num_hash)
-	fmt.Println("bitmap size is ", len(filter.bitmap))
-	fmt.Println("num_bits_inslice is ", filter.num_bits_inslice)
-	filter.Add([]uint64{12446755073609551590, 10446755473632211101})
-	fmt.Println("num_bitmap is ", filter.bitmap)
-	isSet := filter.Has([]uint64{12446755073609551598, 10446755473632211100}) 
-	fmt.Println("isSet is ", isSet)
-
-
-
-	// c.Assert(filter.Capacity(), Equals, cap)
-	// c.Assert(filter.Checks(), Equals, int64(0))
-	// c.Assert(filter.Hits(), Equals, int64(0))
-	// c.Assert(filter.Misses(), Equals, int64(0))
-	// c.Assert(filter.Keys(), Equals, int64(0))
+type BloomSuite struct {
+	filter *PlainFilter
 }
+
+var _ = Suite(&BloomSuite{})
+
+func (s *BloomSuite) SetUpTest(c *C) {
+	cap := uint64(10000)
+	s.filter = NewPlainFilter(cap, 0.0001)
+	Add("test", s.filter)
+	Add("test_company_0x12446755073609551590", s.filter)
+}
+
+
+func (s *BloomSuite) TestNew(c *C) {
+
+	c.Assert(s.filter.probability, Equals, 0.0001)
+	c.Assert(s.filter.capacity, Equals, uint64(10000))
+	c.Assert(s.filter.num_hash, Equals, uint64(14))
+	c.Assert(s.filter.num_bits_inslice, Equals, uint64(13693))
+	c.Assert(len(s.filter.bitmap), Equals, 23963)
+}
+
+
+func (s *BloomSuite) TestHas(c *C) {	
+	c.Assert(Has("test", s.filter), Equals, true)
+	c.Assert(Has("test_company_0x12446755073609551590", s.filter), Equals, true)
+}
+
+
+func (s *BloomSuite) TestNotHas(c *C) {
+	c.Assert(Has("new_test", s.filter), Equals, false)
+	c.Assert(Has("test_company_0x12446755073609551591", s.filter), Equals, false)
+}
+
+
+func Add(s string, filter *PlainFilter) {
+	h1 := fnv.New64a()
+	h1.Write([]byte(s))
+	hash1 := h1.Sum64()
+
+	h2 := xxhash.New64()
+	h2.Write([]byte(s))
+	hash2 := h2.Sum64()
+
+	filter.Add([]uint64{hash1, hash2})
+}
+
+func Has(s string, filter *PlainFilter) bool {
+	h1 := fnv.New64a()
+	h1.Write([]byte(s))
+	hash1 := h1.Sum64()
+
+	h2 := xxhash.New64()
+	h2.Write([]byte(s))
+	hash2 := h2.Sum64()
+
+	return filter.Has([]uint64{hash1, hash2})
+}
+
+
 
