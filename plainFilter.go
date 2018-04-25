@@ -11,7 +11,7 @@ type PlainFilter struct {
 	num_hash               uint64
 	capacity               uint64
 	num_bits_inslice       uint64
-	bitmap                 uint8
+	bitmap                 []uint8
 }
 
 // Alloc a new plain filter based on the max number of keys and false positive rate.
