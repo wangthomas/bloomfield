@@ -9,11 +9,11 @@ import (
 )
 
 const (
-    letterBytes        = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$^&*()_+-="
-    capacity         = 100
-    probability        = 0.0001
-    key_length        = 50
-    num_keys        = 1000
+    letterBytes         = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$^&*()_+-="
+    capacity            = 100
+    probability         = 0.0001
+    key_length          = 50
+    num_keys            = 1000
 ) 
 
 
@@ -30,19 +30,29 @@ func (s *BloomSuite) SetUpTest(c *C) {
     cap := uint64(capacity)
     s.filter = NewSBF(cap, probability)
     // Init s.keys with random strings
-    for i := 0; i < num_keys; i++ {
-        b := make([]byte, key_length)
-        for j := range b {
-            b[j] = letterBytes[rand.Intn(len(letterBytes))]
+    if len(s.keys) == 0 {
+        for i := 0; i < num_keys; i++ {
+            b := make([]byte, key_length)
+            for j := range b {
+                b[j] = letterBytes[rand.Intn(len(letterBytes))]
+            }
+            s.keys = append(s.keys, string(b))
         }
-        s.keys = append(s.keys, string(b))
     }
 }
 
 
 func (s *BloomSuite) TestNew(c *C) {
-    c.Assert(s.filter.probability, Equals, probability)
-    c.Assert(s.filter.capacity, Equals, uint64(capacity))
+    c.Assert(s.filter.Probability(), Equals, probability)
+    c.Assert(s.filter.Capacity(), Equals, uint64(capacity))
+    for i := 0; i < capacity; i++ {
+        Add(s.keys[i], s.filter)
+    }
+    c.Assert(s.filter.Capacity(), Equals, uint64(capacity))
+
+    Add(s.keys[capacity], s.filter)
+
+    c.Assert(s.filter.Capacity(), Equals, uint64(capacity) * 5)
 }
 
 
@@ -51,9 +61,14 @@ func (s *BloomSuite) TestAdd(c *C) {
         c.Assert(Add(key, s.filter), Equals, true)
     }
 
+    c.Assert(s.filter.Keys(), Equals, uint64(num_keys))
+
     for _, key := range s.keys {
         c.Assert(Add(key, s.filter), Equals, false)
     }
+
+    c.Assert(s.filter.Keys(), Equals, uint64(num_keys))
+
 }
 
 
@@ -65,6 +80,11 @@ func (s *BloomSuite) TestHas(c *C) {
     for _, key := range s.keys {
         c.Assert(Has(key, s.filter), Equals, true)
     }
+
+    c.Assert(s.filter.Checks(), Equals, uint64(num_keys))
+    c.Assert(s.filter.Hits(), Equals, uint64(num_keys))
+    c.Assert(s.filter.Misses(), Equals, uint64(0))
+
 }
 
 
@@ -81,6 +101,10 @@ func (s *BloomSuite) TestNotHas(c *C) {
     c.Assert(Has("juXWihBRrliVwXkB9Ak9%nManCN72ia50paT7fV1fkcx9EcbP5", s.filter), Equals, false)
     c.Assert(Has("7DdxUYlDyhGxm%tBX1G4ELk0RekTboc2PKo3QGLTYEXaDwYoXg", s.filter), Equals, false)
     c.Assert(Has("%eaVQoClbdsC07SjG0j991KPWaPHOSw8FgWJfp7PEjFjcZA3Bt", s.filter), Equals, false)
+
+    c.Assert(s.filter.Checks(), Equals, uint64(5))
+    c.Assert(s.filter.Hits(), Equals, uint64(0))
+    c.Assert(s.filter.Misses(), Equals, uint64(5))
 }
 
 
