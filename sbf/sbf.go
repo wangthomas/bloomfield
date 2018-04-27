@@ -5,10 +5,11 @@ import (
     "sync"
     "sync/atomic"
     "time"
-    "github.com/wangthomas/bloomfield/bloom/plainFilter"
+    "github.com/wangthomas/bloomfield/plainFilter"
 )
 
 // Scalable Bloom Filters
+// Concept is described in the link below
 // http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf
 
 var r float64 = 0.9
@@ -55,23 +56,26 @@ func NewSBFDefault(name string) *SBF {
 }
 
 
+// Retues false if the key is in the SBF already.
+// Otherwise add the key and return true.
 func (t *SBF) Add(hashes []uint64) bool {
+    // Check if the key is in SBF already
     t.mutex.RLock()
-
     for _, pf := range t.plainFilters {
         if pf.Has(hashes) {
             t.mutex.RUnlock()
             return false
         }
     }
-
     t.mutex.RUnlock()
 
+    // Add the key to SBF
     t.mutex.Lock()
     defer t.mutex.Unlock()
     pf := t.plainFilters[len(t.plainFilters)-1]
 
     if t.keys == t.capacity {
+        // SBF is full. Expand it by attaching another plainFilter
         pf := plainFilter.NewPlainFilter(scale_size*pf.Capacity, r*pf.Probability)
         t.plainFilters = append(t.plainFilters, pf)
         atomic.AddUint64(&t.capacity, pf.Capacity)
