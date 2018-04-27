@@ -1,4 +1,4 @@
-package plainFilter
+package sbf
 
 import (
     "testing"
@@ -20,15 +20,15 @@ const (
 func Test(t *testing.T) { TestingT(t) }
 
 type BloomSuite struct {
-    filter     *PlainFilter
-    keys    []string
+    filter      *SBF
+    keys        []string
 }
 
 var _ = Suite(&BloomSuite{})
 
 func (s *BloomSuite) SetUpTest(c *C) {
     cap := uint64(capacity)
-    s.filter = NewPlainFilter(cap, probability)
+    s.filter = NewSBF(cap, probability)
     // Init s.keys with random strings
     for i := 0; i < num_keys; i++ {
         b := make([]byte, key_length)
@@ -43,9 +43,6 @@ func (s *BloomSuite) SetUpTest(c *C) {
 func (s *BloomSuite) TestNew(c *C) {
     c.Assert(s.filter.probability, Equals, probability)
     c.Assert(s.filter.capacity, Equals, uint64(capacity))
-    c.Assert(s.filter.num_hash, Equals, uint64(14))
-    c.Assert(s.filter.num_bits_inslice, Equals, uint64(13693))
-    c.Assert(len(s.filter.bitmap), Equals, 23963)
 }
 
 
@@ -101,7 +98,7 @@ func (s *BloomSuite) BenchmarkHas(c *C) {
 }
 
 
-func Add(s string, filter *PlainFilter) bool {
+func Add(s string, filter *SBF) bool {
     h1 := fnv.New64a()
     h1.Write([]byte(s))
     hash1 := h1.Sum64()
@@ -113,7 +110,7 @@ func Add(s string, filter *PlainFilter) bool {
     return filter.Add([]uint64{hash1, hash2})
 }
 
-func Has(s string, filter *PlainFilter) bool {
+func Has(s string, filter *SBF) bool {
     h1 := fnv.New64a()
     h1.Write([]byte(s))
     hash1 := h1.Sum64()
@@ -124,6 +121,4 @@ func Has(s string, filter *PlainFilter) bool {
 
     return filter.Has([]uint64{hash1, hash2})
 }
-
-
 
