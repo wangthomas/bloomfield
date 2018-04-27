@@ -1,15 +1,13 @@
 package plainFilter
 
 import (
-    "sync"
     "math"
 )
 
 type PlainFilter struct {
-    mutex                  sync.RWMutex
-    probability            float64
+    Probability            float64
     num_hash               uint64
-    capacity               uint64
+    Capacity               uint64
     num_bits_inslice       uint64
     bitmap                 []uint8
 }
@@ -29,9 +27,9 @@ func NewPlainFilter(capacity uint64, probability float64) *PlainFilter {
     return &PlainFilter {
         bitmap:                   bitmap,
         num_hash:                 num_hash,
-        capacity:                 capacity,
+        Capacity:                 capacity,
         num_bits_inslice:         num_bits_inslice,
-        probability:              probability,
+        Probability:              probability,
     }
 }
 
@@ -44,16 +42,11 @@ func (pf *PlainFilter) Add(hashes []uint64) bool {
     for i := uint64(0); i < pf.num_hash; i++ {
         new_hash := getHash(i, hashes)
         uint8_index, shift_index := pf.getIndexShift(i, new_hash)
-
-        pf.mutex.RLock()
         is_set := (pf.bitmap[uint8_index] & (0x1 << shift_index)) != 0
-        pf.mutex.RUnlock()
-
+        
         if !is_set {
             is_new_key = true
-            pf.mutex.Lock()
             pf.bitmap[uint8_index] |= 0x1 << shift_index
-            pf.mutex.Unlock()
         }
     }
     return is_new_key
@@ -67,13 +60,9 @@ func (pf *PlainFilter) Has(hashes []uint64) bool {
         new_hash := getHash(i, hashes)
         uint8_index, shift_index := pf.getIndexShift(i, new_hash)
 
-        pf.mutex.RLock()
         if (pf.bitmap[uint8_index] & (0x1 << shift_index)) == 0  {
-            pf.mutex.RUnlock()
             return false
         }
-        pf.mutex.RUnlock()
-
     }
     return true
 }
