@@ -52,6 +52,7 @@ func (s *BloomSuite) TestNew(c *C) {
 
     Add(s.keys[capacity], s.filter)
 
+    // SBF should be expanded
     c.Assert(s.filter.Capacity(), Equals, uint64(capacity) * 5)
 }
 
@@ -61,12 +62,14 @@ func (s *BloomSuite) TestAdd(c *C) {
         c.Assert(Add(key, s.filter), Equals, true)
     }
 
+    // num_keys unique( with little collision possibility) keys are added
     c.Assert(s.filter.Keys(), Equals, uint64(num_keys))
 
     for _, key := range s.keys {
         c.Assert(Add(key, s.filter), Equals, false)
     }
 
+    // Duplicated keys are added. Keys() should stay the same
     c.Assert(s.filter.Keys(), Equals, uint64(num_keys))
 
 }
@@ -81,6 +84,7 @@ func (s *BloomSuite) TestHas(c *C) {
         c.Assert(Has(key, s.filter), Equals, true)
     }
 
+    // All checks should hit
     c.Assert(s.filter.Checks(), Equals, uint64(num_keys))
     c.Assert(s.filter.Hits(), Equals, uint64(num_keys))
     c.Assert(s.filter.Misses(), Equals, uint64(0))
@@ -102,6 +106,7 @@ func (s *BloomSuite) TestNotHas(c *C) {
     c.Assert(Has("7DdxUYlDyhGxm%tBX1G4ELk0RekTboc2PKo3QGLTYEXaDwYoXg", s.filter), Equals, false)
     c.Assert(Has("%eaVQoClbdsC07SjG0j991KPWaPHOSw8FgWJfp7PEjFjcZA3Bt", s.filter), Equals, false)
 
+    // All checks should miss
     c.Assert(s.filter.Checks(), Equals, uint64(5))
     c.Assert(s.filter.Hits(), Equals, uint64(0))
     c.Assert(s.filter.Misses(), Equals, uint64(5))
