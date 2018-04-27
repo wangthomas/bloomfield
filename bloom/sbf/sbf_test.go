@@ -10,7 +10,7 @@ import (
 
 const (
     letterBytes        = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$^&*()_+-="
-    capacity         = 10000
+    capacity         = 100
     probability        = 0.0001
     key_length        = 50
     num_keys        = 1000
