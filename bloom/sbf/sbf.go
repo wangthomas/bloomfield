@@ -57,6 +57,10 @@ func NewSBFDefault(name string) *SBF {
 
 
 func (t *SBF) Add(hashes []uint64) bool {
+    if t.Has(hashes) {
+        return false
+    }
+
     t.mutex.Lock()
     defer t.mutex.Unlock()
     pf := t.plainFilters[len(t.plainFilters)-1]
