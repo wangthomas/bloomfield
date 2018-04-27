@@ -30,12 +30,14 @@ func (s *BloomSuite) SetUpTest(c *C) {
     cap := uint64(capacity)
     s.filter = NewPlainFilter(cap, probability)
     // Init s.keys with random strings
-    for i := 0; i < num_keys; i++ {
-        b := make([]byte, key_length)
-        for j := range b {
-            b[j] = letterBytes[rand.Intn(len(letterBytes))]
+    if len(s.keys) == 0 {
+        for i := 0; i < num_keys; i++ {
+            b := make([]byte, key_length)
+            for j := range b {
+                b[j] = letterBytes[rand.Intn(len(letterBytes))]
+            }
+            s.keys = append(s.keys, string(b))
         }
-        s.keys = append(s.keys, string(b))
     }
 }
 
