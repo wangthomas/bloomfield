@@ -51,7 +51,7 @@ func NewSBF(capacity uint64, probability float64) *SBF {
 
 // NewDefault returns a new Filter with default settings
 // 100,000 capacity and 0.01 false positive probability
-func NewSBFDefault(name string) *SBF {
+func NewSBFDefault() *SBF {
     return NewSBF(65536, 0.0001)
 }
 
