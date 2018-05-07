@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package bloomfieldpb;
+
+service Bloom {
+	rpc CreateFilter(FilterRequest) returns (Response) {}
+	rpc DropFilter(FilterRequest) returns (Response) {}
+	rpc Add(KeyRequest) returns (Response) {}
+	rpc Has(KeyRequest) returns (HasResponse) {}
+}
+
+enum Status {
+	SUCCESS = 0;
+	FAILURE = 1;
+}
+
+message Hashes {
+	uint64 Hash1 = 1;
+	uint64 Hash2 = 2;
+}
+
+message FilterRequest {
+	string Name = 1;
+}
+
+message KeyRequest {
+	string FilterName = 1;
+	repeated Hashes Hashes = 2;
+}
+
+message Response {
+	Status Status = 1;
+}
+
+message HasResponse {
+	Status Status = 1;
+	repeated bool Has = 2;
+}
+
