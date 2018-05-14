@@ -5,5 +5,5 @@ package bloomfieldpb
 //go get -u google.golang.org/grpc
 //go get -u github.com/golang/protobuf/protoc-gen-go
 //export PATH=$PATH:$GOPATH/bin
-//cd bloomfield/interfaces/
-//protoc -I gRPC/ gRPC/bloomfieldpb.proto --go_out=plugins=grpc:gRPC
+//cd bloomfield/interfaces/gRPC
+//protoc -I bloomfieldpb/ bloomfieldpb/bloomfieldpb.proto --go_out=plugins=grpc:bloomfieldpb/
