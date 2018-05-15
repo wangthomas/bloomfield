@@ -12,6 +12,6 @@ func main() {
 	gh := gRPCHandler.NewgRPCHandler(fm)
 	gs := gRPCServer.NewgRPCServer(gh)
 
-	gs.Start("tcp", "8073")
+	gs.Start("tcp", "8679")
 
 }
