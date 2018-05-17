@@ -5,7 +5,6 @@ import (
 	"time"
 	"flag"
 	"fmt"
-	"strconv"
 	
 	"github.com/wangthomas/gobloomfield/client"
 )
@@ -49,21 +48,18 @@ func main() {
 
 		case add:
 			filter := flag.Arg(0)
-
-			hash1, _ := strconv.ParseUint(flag.Args()[1], 10, 64)
-			hash2, _ := strconv.ParseUint(flag.Args()[2], 10, 64)
+			key := flag.Arg(1)
 
 			var hasKey bool
-			hasKey, err = client.Add(ctx, filter, []uint64{hash1, hash2})
+			hasKey, err = client.Add(ctx, filter, key)
 			fmt.Println(hasKey)
 
 		case has:
 			filter := flag.Arg(0)
-			hash1, _ := strconv.ParseUint(flag.Args()[1], 10, 64)
-			hash2, _ := strconv.ParseUint(flag.Args()[2], 10, 64)
+			key := flag.Arg(1)
 
 			var hasKey bool
-			hasKey, err = client.Has(ctx, filter, []uint64{hash1, hash2})
+			hasKey, err = client.Has(ctx, filter, key)
 			fmt.Println(hasKey)
 	}
 	if err != nil {
