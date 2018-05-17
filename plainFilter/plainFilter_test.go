@@ -53,11 +53,11 @@ func (s *BloomSuite) TestNew(c *C) {
 
 func (s *BloomSuite) TestAdd(c *C) {
     for _, key := range s.keys {
-        c.Assert(Add(key, s.filter), Equals, true)
+        c.Assert(Add(key, s.filter), Equals, false)
     }
 
     for _, key := range s.keys {
-        c.Assert(Add(key, s.filter), Equals, false)
+        c.Assert(Add(key, s.filter), Equals, true)
     }
 }
 

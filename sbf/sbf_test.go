@@ -59,14 +59,14 @@ func (s *BloomSuite) TestNew(c *C) {
 
 func (s *BloomSuite) TestAdd(c *C) {
     for _, key := range s.keys {
-        c.Assert(Add(key, s.filter), Equals, true)
+        c.Assert(Add(key, s.filter), Equals, false)
     }
 
     // num_keys unique( with little collision possibility) keys are added
     c.Assert(s.filter.Keys(), Equals, uint64(num_keys))
 
     for _, key := range s.keys {
-        c.Assert(Add(key, s.filter), Equals, false)
+        c.Assert(Add(key, s.filter), Equals, true)
     }
 
     // Duplicated keys are added. Keys() should stay the same

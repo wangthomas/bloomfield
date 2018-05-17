@@ -28,7 +28,7 @@ func (t *FilterManager) Create(name string) {
 }
 
 
-func (t *FilterManager) Add(name string, hashes []uint64)  {
+func (t *FilterManager) Add(name string, hashes []uint64) bool {
 
     // Create the filter if it does not exist
     t.mutex.Lock()
@@ -39,7 +39,7 @@ func (t *FilterManager) Add(name string, hashes []uint64)  {
     filter := t.filters[name]
     t.mutex.Unlock()
 
-    filter.Add(hashes)
+    return filter.Add(hashes)
 }
 
 

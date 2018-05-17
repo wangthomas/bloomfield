@@ -5,7 +5,7 @@ package bloomfieldpb;
 service Bloom {
 	rpc CreateFilter(FilterRequest) returns (Response) {}
 	rpc DropFilter(FilterRequest) returns (Response) {}
-	rpc Add(KeyRequest) returns (Response) {}
+	rpc Add(KeyRequest) returns (HasResponse) {}
 	rpc Has(KeyRequest) returns (HasResponse) {}
 }
 
