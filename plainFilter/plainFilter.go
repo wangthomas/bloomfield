@@ -38,18 +38,18 @@ func NewPlainFilter(capacity uint64, probability float64) *PlainFilter {
 // values on the client side already.
 // Return true if it's a new key
 func (pf *PlainFilter) Add(hashes []uint64) bool {
-    is_new_key := false
+    has := true
     for i := uint64(0); i < pf.num_hash; i++ {
         new_hash := getHash(i, hashes)
         uint8_index, shift_index := pf.getIndexShift(i, new_hash)
         is_set := (pf.bitmap[uint8_index] & (0x1 << shift_index)) != 0
         
         if !is_set {
-            is_new_key = true
+            has = false
             pf.bitmap[uint8_index] |= 0x1 << shift_index
         }
     }
-    return is_new_key
+    return has
 }
 
 

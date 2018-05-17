@@ -53,7 +53,9 @@ func main() {
 			hash1, _ := strconv.ParseUint(flag.Args()[1], 10, 64)
 			hash2, _ := strconv.ParseUint(flag.Args()[2], 10, 64)
 
-			err = client.Add(ctx, filter, []uint64{hash1, hash2})
+			var hasKey bool
+			hasKey, err = client.Add(ctx, filter, []uint64{hash1, hash2})
+			fmt.Println(hasKey)
 
 		case has:
 			filter := flag.Arg(0)

@@ -57,14 +57,15 @@ func NewSBFDefault() *SBF {
 
 
 // Retues false if the key is in the SBF already.
-// Otherwise add the key and return true.
+// Otherwise add the key and return false.
 func (t *SBF) Add(hashes []uint64) bool {
     // Check if the key is in SBF already
     t.mutex.RLock()
     for _, pf := range t.plainFilters {
         if pf.Has(hashes) {
             t.mutex.RUnlock()
-            return false
+            // Has the key already.
+            return true
         }
     }
     t.mutex.RUnlock()
@@ -81,8 +82,11 @@ func (t *SBF) Add(hashes []uint64) bool {
         atomic.AddUint64(&t.capacity, pf.Capacity)
     }
 
+    // In most cases added is false. Since we checked the key is not in the filter in the
+    // top half of this function. But there is a tiny chance there is a context switch happens
+    // between the RWLock and we could add the same key twice. So double check added here.
     added := pf.Add(hashes)
-    if added {
+    if !added {
         atomic.AddUint64(&t.keys, 1)
     }
     

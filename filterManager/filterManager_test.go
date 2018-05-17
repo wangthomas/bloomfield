@@ -24,8 +24,11 @@ func (s *BloomSuite) SetUpTest(c *C) {
 
 func (s *BloomSuite) TestAdd(c *C) {
     s.filterManager.Create("testFilter")
-    Add("testFilter", "num1", s.filterManager)
-    Add("testFilter", "num2", s.filterManager)
+    c.Assert(Add("testFilter", "num1", s.filterManager), Equals, false)
+    c.Assert(Add("testFilter", "num2", s.filterManager), Equals, false)
+
+    c.Assert(Add("testFilter", "num1", s.filterManager), Equals, true)
+    c.Assert(Add("testFilter", "num2", s.filterManager), Equals, true)
 
     c.Assert(Has("testFilter", "num1", s.filterManager), Equals, true)
     c.Assert(Has("testFilter", "num2", s.filterManager), Equals, true)
@@ -34,7 +37,7 @@ func (s *BloomSuite) TestAdd(c *C) {
 }
 
 
-func Add(filterName string, key string, fm *FilterManager) {
+func Add(filterName string, key string, fm *FilterManager) bool {
     h1 := fnv.New64a()
     h1.Write([]byte(key))
     hash1 := h1.Sum64()
@@ -43,7 +46,7 @@ func Add(filterName string, key string, fm *FilterManager) {
     h2.Write([]byte(key))
     hash2 := h2.Sum64()
 
-    fm.Add(filterName, []uint64{hash1, hash2})
+    return fm.Add(filterName, []uint64{hash1, hash2})
 }
 
 

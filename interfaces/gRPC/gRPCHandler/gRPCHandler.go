@@ -38,11 +38,11 @@ func (t *gRPCHandler) DropFilter(ctx context.Context, request *pb.FilterRequest)
 	}, nil
 }
 
-func (t *gRPCHandler) Add(ctx context.Context, request *pb.KeyRequest) (*pb.Response, error) {
-	t.filterManager.Add(request.FilterName, request.Hashes)
-
-	return &pb.Response{
+func (t *gRPCHandler) Add(ctx context.Context, request *pb.KeyRequest) (*pb.HasResponse, error) {
+	
+	return &pb.HasResponse{
 		Status: pb.Status_SUCCESS,
+		Has:	t.filterManager.Add(request.FilterName, request.Hashes),
 	}, nil
 }
 
