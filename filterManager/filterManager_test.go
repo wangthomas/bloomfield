@@ -25,43 +25,43 @@ func (s *BloomSuite) SetUpTest(c *C) {
 
 func (s *BloomSuite) TestAdd(c *C) {
     s.filterManager.Create("testFilter")
-    c.Assert(Add("testFilter", "num1", s.filterManager), Equals, false)
-    c.Assert(Add("testFilter", "num2", s.filterManager), Equals, false)
 
-    c.Assert(Add("testFilter", "num1", s.filterManager), Equals, true)
-    c.Assert(Add("testFilter", "num2", s.filterManager), Equals, true)
+    res := s.filterManager.Add("testFilter", getHashes([]string{"num1", "num2"}))
 
-    c.Assert(Has("testFilter", "num1", s.filterManager), Equals, true)
-    c.Assert(Has("testFilter", "num2", s.filterManager), Equals, true)
-    c.Assert(Has("testFilter", "num3", s.filterManager), Equals, false)
-    c.Assert(Has("testFilter1", "num1", s.filterManager), Equals, false)
+    // Keys were not in filter before. Should return false
+    c.Assert(res[0], Equals, false)
+    c.Assert(res[1], Equals, false)
+
+    res = s.filterManager.Add("testFilter", getHashes([]string{"num1", "num2"}))
+
+    // Keys were added in filter above. Should return true
+    c.Assert(res[0], Equals, true)
+    c.Assert(res[1], Equals, true)
+
+    res = s.filterManager.Has("testFilter", getHashes([]string{"num1", "num2", "num3"}))
+
+    // num3 is not in filter. Should return false
+    c.Assert(res[0], Equals, true)
+    c.Assert(res[1], Equals, true)
+    c.Assert(res[2], Equals, false)
+
 }
 
 
-func Add(filterName string, key string, fm *FilterManager) bool {
-    h1 := fnv.New64a()
-    h1.Write([]byte(key))
-    hash1 := h1.Sum64()
+func getHashes(keys []string) []*pb.Hashes {
+    var hashes []*pb.Hashes
+    for _, key := range keys {
+        h1 := fnv.New64a()
+        h1.Write([]byte(key))
+        hash1 := h1.Sum64()
 
-    h2 := xxhash.New64()
-    h2.Write([]byte(key))
-    hash2 := h2.Sum64()
+        h2 := xxhash.New64()
+        h2.Write([]byte(key))
+        hash2 := h2.Sum64()
 
-    return fm.Add(filterName, []*pb.Hashes{&pb.Hashes{Hash1:hash1,
-                                         Hash2:hash2}})[0]
-}
+        hashes = append(hashes, &pb.Hashes{Hash1:hash1, Hash2:hash2})
+    }
 
-
-func Has(filterName string, key string, fm *FilterManager) bool {
-    h1 := fnv.New64a()
-    h1.Write([]byte(key))
-    hash1 := h1.Sum64()
-
-    h2 := xxhash.New64()
-    h2.Write([]byte(key))
-    hash2 := h2.Sum64()
-
-    return fm.Has(filterName, []*pb.Hashes{&pb.Hashes{Hash1:hash1,
-                                         Hash2:hash2}})[0]
+    return hashes
 }
 
