@@ -25,7 +25,7 @@ message FilterRequest {
 
 message KeyRequest {
 	string FilterName = 1;
-	repeated uint64 Hashes = 2;
+	repeated Hashes Hashes = 2;
 }
 
 message Response {
@@ -34,6 +34,6 @@ message Response {
 
 message HasResponse {
 	Status Status = 1;
-	bool Has = 2;
+	repeated bool Has = 2;
 }
 

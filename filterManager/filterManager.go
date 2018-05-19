@@ -3,6 +3,7 @@ package filterManager
 import (
     "sync"
     "github.com/wangthomas/bloomfield/sbf"
+    pb "github.com/wangthomas/bloomfield/interfaces/gRPC/bloomfieldpb"
 )
 
 type FilterManager struct {
@@ -28,7 +29,8 @@ func (t *FilterManager) Create(name string) {
 }
 
 
-func (t *FilterManager) Add(name string, hashes []uint64) bool {
+func (t *FilterManager) Add(name string, hashes []*pb.Hashes) []bool {
+    var res []bool
 
     // Create the filter if it does not exist
     t.mutex.Lock()
@@ -39,20 +41,37 @@ func (t *FilterManager) Add(name string, hashes []uint64) bool {
     filter := t.filters[name]
     t.mutex.Unlock()
 
-    return filter.Add(hashes)
+    //return []bool{filter.Add([]uint64{hashes[0].Hash1, hashes[0].Hash2})}
+
+    for _, hash := range hashes {
+        res = append(res, filter.Add([]uint64{hash.Hash1, hash.Hash2}))
+    }
+
+    return res
 }
 
 
-func (t *FilterManager) Has(name string, hashes []uint64) bool {
+func (t *FilterManager) Has(name string, hashes []*pb.Hashes) []bool {
+    var res []bool
 
     t.mutex.RLock()
     if _, exists := t.filters[name]; !exists {
         t.mutex.RUnlock()
-        return false
+        for range hashes {
+            res = append(res, false)
+        }
+        return res
     }
     filter := t.filters[name]
     t.mutex.RUnlock()
-    return filter.Has(hashes)
+
+    //return []bool{filter.Has([]uint64{hashes[0].Hash1, hashes[0].Hash2})}
+
+    for _, hash := range hashes {
+        res = append(res, filter.Has([]uint64{hash.Hash1, hash.Hash2}))
+    }
+
+    return res
 }
 
 

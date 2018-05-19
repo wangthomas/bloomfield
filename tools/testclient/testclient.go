@@ -48,18 +48,18 @@ func main() {
 
 		case add:
 			filter := flag.Arg(0)
-			key := flag.Arg(1)
+			keys := flag.Args()[1:]
 
-			var hasKey bool
-			hasKey, err = client.Add(ctx, filter, key)
+			var hasKey []bool
+			hasKey, err = client.Add(ctx, filter, keys)
 			fmt.Println(hasKey)
 
 		case has:
 			filter := flag.Arg(0)
-			key := flag.Arg(1)
+			keys := flag.Args()[1:]
 
-			var hasKey bool
-			hasKey, err = client.Has(ctx, filter, key)
+			var hasKey []bool
+			hasKey, err = client.Has(ctx, filter, keys)
 			fmt.Println(hasKey)
 	}
 	if err != nil {

@@ -5,6 +5,7 @@ import (
     "hash/fnv"
     "github.com/OneOfOne/xxhash"
     . "gopkg.in/check.v1"
+    pb "github.com/wangthomas/bloomfield/interfaces/gRPC/bloomfieldpb"
 )
 
 
@@ -46,7 +47,8 @@ func Add(filterName string, key string, fm *FilterManager) bool {
     h2.Write([]byte(key))
     hash2 := h2.Sum64()
 
-    return fm.Add(filterName, []uint64{hash1, hash2})
+    return fm.Add(filterName, []*pb.Hashes{&pb.Hashes{Hash1:hash1,
+                                         Hash2:hash2}})[0]
 }
 
 
@@ -59,6 +61,7 @@ func Has(filterName string, key string, fm *FilterManager) bool {
     h2.Write([]byte(key))
     hash2 := h2.Sum64()
 
-    return fm.Has(filterName, []uint64{hash1, hash2})
+    return fm.Has(filterName, []*pb.Hashes{&pb.Hashes{Hash1:hash1,
+                                         Hash2:hash2}})[0]
 }
 
