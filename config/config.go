@@ -16,7 +16,8 @@ type Configuration struct {
 func LoadConfig(configFile string) {
 
 	if _, err := toml.DecodeFile(configFile, &Config); err != nil {
-		fmt.Println("Cannot load config file. Using default config. Err is %s", err)
+		fmt.Println("Cannot load config file. Using default config.", err)
+		LoadDefault()
 		return
 	}
 }
