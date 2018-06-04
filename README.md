@@ -85,4 +85,4 @@ The original keys are encrypted inside the network payload.
 
 ## References
 
-https://bitwangtuo.com/2018/01/01/a-scalable-bloom-filter
+http://haslab.uminho.pt/cbm/files/dbloom.pdf
