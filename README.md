@@ -1,12 +1,13 @@
 # bloomfield
 
-A high performance bloom filter service in Golang.
+A scalable bloom filter service in Golang.
 
 ## Features
 
 1. Designed for microservice systems.
 2. Scalable bloom filters.
-3. Grpc interface.
+3. Client-side hashing
+4. Grpc interface.
 
 
 ## Start command
@@ -54,16 +55,13 @@ the return should be false.
 Go - [gobloomfield](https://github.com/wangthomas/gobloomfield)
 
 
-## Why it's high performance
-
-A traditional bloom filter service would accept a key as a string and perform hashing using multiple hash functions. Then the hash values
-would be mapped into a bitmap. The most time consuming task is the hashing. 
-
-Bloomfield is using client-side hashing -- the hashing is done on the client side only.
-
 ## Why client-side hashing
 
-The hashing has to be done anyway on the client side. What's the benefits for the overall system? 
+A traditional bloom filter service would accept a key as a string and perform hashing using multiple hash functions.
+
+Bloomfield is using client-side hashing -- hashing(partial) is done on the client side.
+
+### Benefits of client-side hashing 
 
 1. Avoid overloading.
 
@@ -81,9 +79,6 @@ Reducing the playload size would reduce the Kafka storage's footprint.)
 3. Security. 
 
 The original keys are encrypted inside the network payload.
-
-## Benchmark Test
-
 
 
 ## References
