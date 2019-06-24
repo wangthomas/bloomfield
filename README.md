@@ -4,6 +4,10 @@ A scalable bloom filter service in Golang.
 
 [![Build Status](https://travis-ci.com/wangthomas/bloomfield.svg?branch=master)](https://travis-ci.com/wangthomas/bloomfield)
 
+## Docker Image
+
+docker pull wangthomas/bloomfield
+
 ## Features
 
 1. Designed for microservice systems.
